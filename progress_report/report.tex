@@ -1,0 +1,75 @@
+% PREAMBLE
+\documentclass[a4paper, 12pt, titlepage]{report}
+\usepackage[top=1in,right=2.5cm,left=2.5cm,bottom=1in]{geometry}
+\usepackage{mathptmx}
+\usepackage{hyperref}
+\usepackage{epsfig} 
+\usepackage{tipa}
+\usepackage{subfigure}
+\usepackage{footnote}
+\usepackage[gnu]{newtitle} 
+\usepackage{fancyheadings} 
+\usepackage[numbers,square]{natbib}
+\pagestyle{empty}
+\usepackage[grey,times]{honoursThesis}
+\usepackage{listings}
+\usepackage[final]{pdfpages}
+
+
+% TITLE PAGE
+\title{ENEL440 Progress Report}
+\date{\today}
+
+\author{
+  {Benjamin Washington-Yule}\vspace{-0.1cm}\\
+  {\tt byu17@uclive.ac.nz (92646188)}\vspace{0.2cm}\\
+  {Henry Jenkins}\vspace{-0.1cm}\\
+  {\tt hvj10@uclive.ac.nz (83238549)}\vspace{0.2cm}\\
+    Department of Computer and Electrical Engineering\vspace{0.1cm}\\
+    University of Canterbury, Christchurch, New Zealand}
+\setcounter{tocdepth}{1}
+\begin{document}
+\maketitle
+\pagenumbering{roman}
+%\frontmatter
+\thispagestyle{empty}
+%\input{abstract}
+
+\pagestyle{fancy}
+
+\renewcommand{\chaptermark}[1]
+{\markboth{\uppercase{\thechapter.\ #1}}{}}
+%\renewcommand{\sectionmark}[1]
+%{\markboth{\uppercase{\thesection.\ #1}}{}} % Changed so the section is on both. - Wim
+\setlength{\headrulewidth}{0.5pt} \setlength{\footrulewidth}{0pt}
+
+\newcommand{\helv}{\fontfamily{pag}\fontseries{b}\fontsize{9}{11}\selectfont}
+
+% Changed these so page numbers are always on the right and the headers are
+% always on the left. - Wim
+\lhead[\helv \leftmark]{\helv \leftmark}
+\rhead[\helv \thepage]{\helv \thepage}
+\cfoot[]{}
+
+%\newpage
+%\tableofcontents
+%\newpage
+
+%\mainmatter
+
+%  \input{introduction}
+%  \input{background}
+%  \input{technical}
+%  \input{discussion}
+%  \input{conclusion}
+  \newpage
+
+\newpage
+%\bibliographystyle{apa-good}
+\bibliography{report}
+\addcontentsline{toc}{chapter}{Bibliography}
+
+\appendix
+  \input{appendix}
+
+\end{document}
