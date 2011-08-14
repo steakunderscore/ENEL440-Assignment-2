@@ -1,0 +1,226 @@
+\documentclass[11pt]{article} 
+
+% Simpler tables
+\usepackage{tabularx}
+
+% Muliple rows
+\usepackage{multirow}
+
+% Margins
+\usepackage[margin=2.5cm]{geometry}
+
+% Images
+\usepackage{graphicx}
+
+% Basic math stuff.
+\usepackage{mathtools}
+\usepackage{amsmath}
+
+% Allows us to use .eps files.
+% pdflatex --shell-escape --synctex=1 file.tex
+\usepackage{epstopdf}
+
+% Images in figures.
+\usepackage{subfig}
+
+% Colours
+\usepackage[usenames,dvipsnames]{color}
+\definecolor{MyLightGray}{gray}{.90}
+
+% Font stuff
+\usepackage{palatino} % A nice alternative to Computer Modern
+
+% Hyperlinks
+\usepackage{hyperref}
+
+% Code listings
+\usepackage{listings}
+\lstset{
+	frame=single,
+    basicstyle=\small\ttfamily,
+	keywordstyle=\color{black}\bfseries,
+	commentstyle=\color{OliveGreen},
+}
+
+% Tightly spaced lists, example:
+% \begin{compactitem}
+% \item ...
+% \end{compactitem}
+\usepackage{paralist}
+
+\begin{document}
+\title{Particle Filter Techniques and Applications}
+\author{Benjamin Washington-Yule, Henry Jenkins}
+\maketitle
+
+\begin{abstract}
+Probably don't need an abstract for a 4 page progress report.
+\end{abstract}
+
+\section{Introduction}
+intro
+
+\section{Background}
+Particle filters are a class of sophisticated sequential estimation techniques
+for estimating the state of a dynamical system. They are sequential in that they
+incrementally approximate the probability distributions of a system as more
+information is gathered. The applications of particle filters are often the
+same as those of the closely related Kalman filter, among which the most common
+are: optical tracking, communications systems and robotics sensors. However,
+where the Kalman filter estimation technique fails when the noise is not
+Gaussian or the system is non-linear, particle filter techniques may potentially
+succeed.
+
+\subsection{Sequential Estimation}
+The sequential nature of the particle filter method is important. It is
+generally desirable to use information incrementally as it arrives, rather
+than gathering all of the required information and then finally using it to
+estimate the statistics of a system. 
+
+A simple example is a physical process that is described by a random variable
+for which we have no knowledge of the statistics. The simplest statistic we may
+wish to estimate is the mean. If we did indeed have the PDF it could find it
+using
+\begin{equation} \label{eq:someequation}
+\mu = \int{xp_{X}(x)\textrm\,{d}x},
+\end{equation}
+however we have assumed that we do not have such knowledge. We can still
+estimate the mean by collecting samples of the process $\{x_{1}, x_{2}, ... ,
+x_{n}\}$. The sample mean is then given by
+\begin{equation}
+m = \frac{1}{n}\sum\limits_{i = 0}^{n}{x_{i}}
+\end{equation}
+This is not altogether desirable because we must wait until all $n$ observations
+have been made before using the information. It would be better if we could
+incrementally update our estimate of the mean as more information is acquired.
+In the case that we only have one sample $x_{1}$, our best estimate of the mean
+would be the sample itself, i.e.,
+\begin{equation*}
+m_{1} = x_{1}
+\end{equation*}
+Extending this to $k$ samples, the current best estimate can be written as a
+partial sum,
+\begin{equation}
+m_{k} = \frac{1}{k}\sum\limits_{i = 1}^k{x_{k}}
+\end{equation}
+Since we wish to sequentially update our estimate, our goal is to write this
+in terms of our current observation $x_{k}$ and the previous estimate of the
+mean $m_{k-1}$,
+\begin{align*}
+m_{k} &= \frac{1}{k}x_{k} + \frac{1}{k}\sum\limits_{i = 1}^{k-1}{x_{k}} \\
+&= \frac{1}{k}x_{k} + \frac{1}{k}\frac{k-1}{k-1}\sum\limits_{i=1}^{k-1}{x_{k}} \\
+&= \frac{1}{k}x_{k} + \frac{k-1}{k}\frac{1}{k-1}\sum\limits_{i=1}^{k-1}{x_{k}} \\
+&= \frac{1}{k}x_{k} + \frac{k-1}{k}m_{k-1}
+\end{align*}
+This is the sequential estimate of the mean of our simple random variable.
+
+\subsection{State Space}
+We can extend sequential estimation ideas above to the state of a dynamic
+system. Let $\mathbf{x}_{k}$ denote the state of the system at time $k$,
+$\mathbf{u}_{k}$ denote the input to the system at time $k$ and
+$\mathbf{z}_{k}$ denote the observation at time $k$. We form the usual state
+space representation of the system,
+\begin{equation}
+\mathbf{x}_{k} = \mathbf{A}\mathbf{x}_{k-1} + \mathbf{B}\mathbf{u}_{k} + \nu
+\end{equation}
+\begin{equation}
+\mathbf{z}_{k} = \mathbf{C}\mathbf{x}_{k} + eta
+\end{equation}
+It is worth noting that by written the state space thus we have assumed
+linearity.
+
+The Kalman filter attempts to estimate the current state $\mathbf{x}_{k}$ using
+the distribution $\textrm{P}(\mathbf{x}_{k}\,|\,\mathbf{z}_{0:k})$, that is, the
+unobserved state given the sequence of observations up to time $k$, which
+it assumes it is a multivariate Gaussian distribution. The particle filter does
+not make this assumption, and this means that
+$\textrm{P}(\mathbf{x}_{k}|\mathbf{z}_{0:k})$ cannot be written in a simple
+form~{\cite{ref:1}}. So we instead approximate the distributions
+by discrete random measures defined by particles $x^{(m)}$, each with an
+associated weight $w^{(m)}$, where $1 < m < M$~{\cite{ref:2}}.
+
+We can use the particles and corresponding weights to approximate a general
+distribution $p_{X}(x)$ by
+\begin{equation}
+p_{X}(x) ~= \sum\limits_{m=1}^{M}{w^{(m)}\delta(x-x^{(m)})}
+\end{equation}
+Using this approximation allows calculation of statistics of a system to be
+simplified to summations, as opposed to expressions involving possibly complex
+integrals. 
+
+But this begs the question, how were the set of particles that approximate the
+distribution created? One answer is \emph{importance sampling}, i.e., the
+particle filter is simply acting as an importance sampler.
+
+\subsection{Importance Sampling}
+
+A particle filter extends the situations where system state can be estimated. A
+Kalman filter can be used to estimate the state of the system above, but only
+because it is linear, and the noise is (assumed) Gaussian. The particle filter
+method can deal with non-linear systems so we can extend the general state
+space thus:
+\begin{equation}
+\mathbf{x}_{k} = f(\mathbf{x}_{k-1}, u_{k-1}) + \nu
+\end{equation}
+\begin{equation}
+\mathbf{z}_{k} = g(\mathbf{x}_{k}) + \eta
+\end{equation}
+Where $f$ and $g$ are general functions that are non-necessarily linear and
+neither noises $\nu$ or $\eta$ are necessarily Gaussian.
+
+\subsubsection{Summary}
+The particle filter has much the same applications as the extended Kalman
+filter. In the case that the state space is linear and the noise Gaussian, the
+Kalman and particle filters theoretically achieve the same results. It is in
+the case where the state space is non-linear and/or the noise not Gaussian that
+the usefulness of the particle filter method becomes apparent.
+
+\section{Application Example}
+The application chosen is video tracking, that is, tracking an object on screen.
+This is a common application of a Kalman filter and it is likely that a Kalman
+(or extended Kalman) filter would do a sufficient job, but the goal is to do the
+same thing with a particle filter and if possible, compare the results to that
+of a Kalman filter.
+
+No single reference video has been decided on, this is intentional as we are
+unsure at this stage of the difficulty of the code given the time constraint. A
+2D video simple objects will be the easiest to track, but a real-life 3D video
+obviously has more applications. It is hoped that even if the particle filter
+method is only implemented for a 2D video, it will be left in such a state that
+it can with a little more work, handle more complex video.
+
+Looking at video tracking in the simplest way possible, it is the association of
+an object in consecutive video frames. It is interesting that this is a task
+for which the human eye is very well suited, but can be very difficult for
+computers. 
+
+\subsection{Plan}
+The application chosen to illustrate our topic is video tracking, as discussed
+above. We intend to implement code in Matlab to track objects in videos to (i)
+prove that particle filtering techniques can be used for this application,
+(ii) analyse the performance and usefulness of these techniques and (iii)
+compare the performance with the Kalman filtering method. A metric for success
+has not been decided upon but will hopefully become clearer after some
+experimentation.
+
+The videos chosen will ideally feature a single object moving inside some
+stationary scene. If we are able to successfully track the object then it would
+be interesting to investigate the tracking performance when the object is
+obscured (behind some environmental feature) for one or more frames. After a
+little investigation it is clear that there is a large amount of videos that
+would satisfy our requirements on the internet.
+
+\section{Math}
+
+% Bibliography. The "99" allows up to 99 entries apparently.
+\begin{thebibliography}{99}
+\bibitem{ref:1} S. Arulampalam, S. Maskell, N. Gordon, and T. Clapp. A tutorial
+on particle filters for on-line non-linear/non-gaussian baysian tracking.
+\emph{IEEE Transactions on Signal Processing, 50(2):174-188, February 2002.}
+
+\bibitem{ref:2} P. M. Djuric, J. H. Kotecha, J.Zhang, Y. Huang, T. Ghirmai, M.
+F. Bugallo, J. Miguez. Particle Filtering. \emph{IEEE Transactions on Signal
+Processing, 20(5):19-37, September 2003.}
+\end{thebibliography}
+
+\end{document}
