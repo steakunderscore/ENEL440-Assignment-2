@@ -53,20 +53,16 @@
 \author{Benjamin Washington-Yule, Henry Jenkins}
 \maketitle
 
-\begin{abstract}
-Probably don't need an abstract for a 4 page progress report.
-\end{abstract}
-
 \section{Introduction}
-The report briefly summarizes the progress made to date of the second ENEL440
+The report briefly summarizes the progress to date of the second ENEL440
 assignment. Much of the progress has focus on acquiring an in-depth knowledge
-of the allocated subject, and has required a large amount of reading. Particle
-filtering relies on rather complex ideas and it is important to develop a good
-understanding of these before attempting to develop an application.
+of the subject allocated to us, and has required a large amount of reading.
+Particle filtering relies on rather complex ideas and it is important to have
+a good understanding of these before attempting to develop an application.
 
-Even so, a suitable application that is already commonly used for a closely
-related filter (the Kalman filter, see below) has been decided on and is
-discusses in section \ref{sec:application}.
+However, a suitable application has indeed been found. It is one that is already
+a common task for the closely related Kalman filter. The chosen application is
+discussed in section \ref{sec:application}.
 
 \section{Background}
 Particle filters are a class of sophisticated sequential estimation techniques
@@ -136,8 +132,8 @@ space representation of the system,
 \begin{equation}
 \mathbf{z}_{k} = \mathbf{C}\mathbf{x}_{k} + \eta
 \end{equation}
-It is worth noting that by written the state space thus we have assumed
-linearity.
+Where $\eta$ and $\nu$ are noises. It is worth noting that by written the state
+space thus we have assumed linearity.
 
 The Kalman filter attempts to estimate the current state $\mathbf{x}_{k}$ using
 the distribution $\textrm{P}(\mathbf{x}_{k}\,|\,\mathbf{z}_{0:k})$, that is, the
@@ -170,14 +166,23 @@ weights of the particles at each sample point are calculated using
 \begin{equation} \label{eq:weights}
 w^{(m)}_{k} \propto
 \frac
-{p(z_{k}\,|\,x^{(m)}_{k})\,p(x^{m}_{k}\,|\,x^{(m)}_{k-1})}{\pi(x^{(m)}_k\,|\,x^{
-(m)}_{0:k-1}, z_{0:k}}
+{p(\mathbf{z}_{k}\,|\,\mathbf{x}^{(m)}_{k})\,p(\mathbf{x}^{m}_{k}\,|\,\mathbf{x}
+^ {(m)}_{ k-1})}{ \pi(\mathbf{x}^{(m)} _k\,|\,\mathbf{x}^{
+(m)}_{0:k-1}, \mathbf{z}_{0:k})}w^{(m)}_{k-1}
 \end{equation}
-The particles are then \emph{re-sampled} at each time step. The importance
-sampling algorithm is thus implemented using two steps for every $k$: (i) Draw
-the particles from the proposal distribution and (ii) computing the weights
-according to \ref{eq:weights}, where the initial weights are simply
-$\frac{1}{N}$ where $N$ is the number of particles drawn in step (i).
+Depending on the choice of proposal distribution, Equation~\ref{eq:weights}
+may reduce to a simpler form. It is important to note that the particles are
+\emph{re-sampled} at each time step. The importance sampling algorithm is thus
+implemented using two steps for every $k$: (i) Draw the particles from the
+proposal distribution and (ii) computing the weights according to
+\ref{eq:weights}, where the initial weights are simply $\frac{1}{N}$ where $N$
+is the number of particles drawn in step (i). The weights can be used to find an
+estimate of the new state vector.
+
+% The new state vector can finally be found thus,
+% \begin{equation}
+% \mathbf{x}_{k} ~= \sum\limits_{m=1}^{M}{w^{(m)}_{k}\mathbf{x}^{(m)}_{k}}
+% \end{equation}
 
 \subsection{Summary}
 A particle filter extends the situations where system state can be estimated. A
@@ -219,7 +224,7 @@ an object in consecutive video frames. It is interesting that this is a task
 for which the human eye is very well suited, but can be very difficult for
 computers. 
 
-\subsection{Plan}
+\subsection{Current Plan}
 The application chosen to illustrate our topic is video tracking, as discussed
 above. We intend to implement code in Matlab to track objects in videos to (i)
 prove that particle filtering techniques can be used for this application,
@@ -234,8 +239,6 @@ be interesting to investigate the tracking performance when the object is
 obscured (behind some environmental feature) for one or more frames. After a
 little investigation it is clear that there is a large amount of videos that
 would satisfy our requirements on the internet.
-
-\section{Math}
 
 % Bibliography. The "99" allows up to 99 entries apparently.
 \begin{thebibliography}{99}
