@@ -55,10 +55,10 @@
 
 \section{Introduction}
 The report briefly summarizes the progress to date of the second ENEL440
-assignment. Much of the progress has focus on acquiring an in-depth knowledge
+assignment. Much of the progress has focused on acquiring an in-depth knowledge
 of the subject allocated to us, and has required a large amount of reading.
-Particle filtering relies on rather complex ideas and it is important to have
-a good understanding of these before attempting to develop an application.
+Particle filtering relies on rather complex ideas and we feel it is important to
+have a good understanding of these before attempting to develop an application.
 
 However, a suitable application has indeed been found. It is one that is already
 a common task for the closely related Kalman filter. The chosen application is
@@ -118,7 +118,8 @@ m_{k} &= \frac{1}{k}x_{k} + \frac{1}{k}\sum\limits_{i = 1}^{k-1}{x_{k}} \\
 \\
 &= \frac{1}{k}x_{k} + \frac{k-1}{k}m_{k-1}
 \end{align*}
-This is the sequential estimate of the mean of our simple random variable.
+This is the sequential estimate of the mean of our simple random variable. This
+idea is a key element of the particle filter method.
 
 \subsection{State Space}
 We can extend sequential estimation ideas above to the state of a dynamic
@@ -132,8 +133,8 @@ space representation of the system,
 \begin{equation}
 \mathbf{z}_{k} = \mathbf{C}\mathbf{x}_{k} + \eta
 \end{equation}
-Where $\eta$ and $\nu$ are noises. It is worth noting that by written the state
-space thus we have assumed linearity.
+Where $\eta$ and $\nu$ are noise terms. It is worth noting that by written the
+state space thus we have assumed linearity.
 
 The Kalman filter attempts to estimate the current state $\mathbf{x}_{k}$ using
 the distribution $\textrm{P}(\mathbf{x}_{k}\,|\,\mathbf{z}_{0:k})$, that is, the
@@ -175,7 +176,7 @@ may reduce to a simpler form. It is important to note that the particles are
 \emph{re-sampled} at each time step. The importance sampling algorithm is thus
 implemented using two steps for every $k$: (i) Draw the particles from the
 proposal distribution and (ii) computing the weights according to
-\ref{eq:weights}, where the initial weights are simply $\frac{1}{N}$ where $N$
+(\ref{eq:weights}), where the initial weights are simply $\frac{1}{N}$ where $N$
 is the number of particles drawn in step (i). The weights can be used to find an
 estimate of the new state vector.
 
