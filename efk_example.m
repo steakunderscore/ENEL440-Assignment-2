@@ -53,6 +53,7 @@ F -> df1/dx1 = 0    df1/dx2 = cos(x2*time)*time
 
 clear all; close all;
 
+% this line is here for git to see.
 
 % Initial Conditions
 x(:,1) = [0;0.05];      %Our real plant initial condition       
@@ -110,6 +111,7 @@ figure(1);clf; hold on;
 %plot(x_(1,:)+2*sigmaP(1,:),'-g');   %These two are the threshold in witch I'm certain that the plant state is at a given time
 plot(x_(1,:)-2*sigmaP(1,:),'-g');
 
+% and again ...
 
 figure(2);clf;hold on;
 plot(x(2,:),'-b');                  %Frecuency estimation
