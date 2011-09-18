@@ -1,0 +1,258 @@
+\documentclass[a4paper, 12pt]{article}
+
+% Margins
+% \usepackage[margin=2.5cm]{geometry}
+\usepackage[top=1in,right=1.5in,left=1.5in,bottom=1in]{geometry}
+
+% Headers and footers.
+% useful options:
+%   \thepage : the current page
+%   \thispagestyle{empty} : kill header/footer on current page
+\usepackage{fancyhdr}
+% \lhead{Left Header}
+% \chead{Center Header}
+% \rhead{Right Header}
+% \lfoot{Left Footer}
+% \cfoot{Center Footer}
+% \rfoot{Right Header}
+
+% Control page header/footer.
+% \pagestyle{plain} % No headers/footers.
+% \pagestyle{headings} % Simple
+\pagestyle{fancy}
+
+% From Wim's. Don't know what they do
+% \usepackage[T1]{fontenc}
+% \usepackage{tgbonum}
+
+% Simpler tables
+\usepackage{tabularx}
+
+% Muliple rows
+\usepackage{multirow}
+
+% Images
+\usepackage{graphicx}
+
+% Basic math stuff.
+\usepackage{mathtools}
+\usepackage{amsmath}
+
+% Allows us to use .eps files.
+% pdflatex --shell-escape --synctex=1 file.tex
+\usepackage{epstopdf}
+
+% Images in figures.
+\usepackage{subfig}
+
+% Turns off page numbering.
+%\pagestyle{empty}
+
+% Make captions look better.
+\usepackage{caption}
+\captionsetup{margin=30pt,font=small,labelfont=bf}
+
+% Colours
+\usepackage[usenames,dvipsnames]{color}
+\definecolor{MyLightGray}{gray}{.90}
+
+% Font stuff
+\usepackage{palatino} % A nice alternative to Computer Modern
+
+\usepackage{parskip}
+% \setlength{\parskip}{0.1in}
+% \setlength{\parindent}{0in}
+
+% Hyperlinks
+\usepackage{hyperref}
+
+% Code listings
+\usepackage{listings}
+\lstset{
+	frame=single,
+        basicstyle=\small\ttfamily,
+	keywordstyle=\color{black}\bfseries,
+	commentstyle=\color{OliveGreen},
+}
+
+% To turn off section numbering:
+% \section*{My Attempt}
+%
+
+% Tightly spaced lists, example:
+% \begin{compactitem}
+% \item ...
+% \end{compactitem}
+\usepackage{paralist}
+
+% TODO
+%\clearpage
+%\newpage
+%\linebreak
+
+\begin{document}
+\title{LaTeX Template}
+\author{Benjamin Washington-Yule}
+
+% One or tather.
+\maketitle
+% \input{title}
+
+\begin{abstract}
+The best abstract in the world.
+\end{abstract}
+
+\input{introduction}
+\input{background}
+\input{application}
+
+\section{And Now for a Table}
+Because tables take so long, how about some pre-made ones?
+
+\begin{tabular*}{0.75\textwidth}{@{\extracolsep{\fill}} | c | c | c | c | } 
+    \hline 
+    label 1 & label 2 & label 3 & label 4 \\ 
+    \hline 
+    item 1 & item 2 & item 3 & item 4 \\ 
+    \hline 
+\end{tabular*}
+
+\begin{table}[h]
+\begin{tabular}{|p{0.2\textwidth}|p{0.25\textwidth}|p{0.25\textwidth}|p{0.25\textwidth}|}
+    \hline
+    label 1 & label 2 & label 3 & label 4 \\ 
+    \hline 
+    item 1 & item 2 & item 3 & item 4 \\ 
+    \hline
+\end{tabular}
+\end{table}
+
+\begin{tabularx}{\textwidth}{ |X|X|X|X| }
+  \hline
+  label 1 & label 2 & label 3 & label 4 \\
+  \hline
+  item 1  & item 2  & item 3  & item 4  \\
+  \hline
+\end{tabularx}
+
+We really need some text here.
+
+\begin{table}[h]\footnotesize
+  \caption{Smaller text!}
+  \begin{tabularx}{\textwidth}{ |X|X|X|X| }
+  \hline
+  label 1 & label 2 & label 3 & label 4 \\
+  \hline
+  item 1  & item 2  & item 3  & item 4  \\
+  \hline
+\end{tabularx}
+\end{table}
+
+\begin{tabular}{|l|l|l|} 
+\hline 
+\multicolumn{3}{|c|}{Team sheet} \\ 
+\hline Goalkeeper & GK & Paul Robinson \\ 
+\hline 
+\multirow{4}{*}{Defenders} & LB & Lucus Radebe \\ 
+& DC & Michael Duberry \\ & DC & Dominic Matteo \\ 
+& RB & Didier Domi \\ 
+\hline 
+\multirow{3}{*}{Midfielders} & MC & David Batty \\ 
+& MC & Eirik Bakke \\ 
+& MC & Jody Morris \\ 
+\hline Forward & FW & Jamie McMaster \\ 
+\hline \multirow{2}{*}{Strikers} & ST & Alan Smith \\ 
+& ST & Mark Viduka \\ 
+\hline \end{tabular}
+
+
+\begin{table}
+\centering
+\begin{tabular}{llrlr}
+\hline
+. &
+\multicolumn{2}{c}{C} & \multicolumn{2}{c}{$\beta$} \\
+Noise Level & 90\% CI & Median & 90\% CI & Median\\
+\hline
+0\%  & 0.0000 & 5.0000 & 0.0000 & 1.0000 \\
+5\%  & 0.0134 & 4.91553 & 0.00688 & 1.00231\\
+10\% & 0.0610 & 4.90173 & 0.01223 & 1.00352\\
+15\% & 0.0734 & 4.97856 & 0.01972& 1.01565 \\
+20\% & 0.0560 & 4.66138 & 0.02546 & 1.01247 \\
+25\% & 0.1197 & 5.18643 & 0.03301& 1.08063 \\
+30\% & 0.9834 & 5.16069 & 0.03640 & 1.09117 \\
+35\% & 0.0452 & 4.38107 & 0.07970 & 1.06727 \\
+40\% & 0.5356 & 5.29536 & 0.11502 & 1.12372 \\
+\hline
+\end{tabular}
+\label{tab:noise}
+\caption{Parameters obtained from identification function.}
+\end{table}
+
+\section{Images and Figures}
+\begin{figure}[h]
+  \centering
+  \subfloat[An apple]{\label{fig:apple}\includegraphics[width=0.4\textwidth]{images/apple}}       
+  \hspace{40pt}
+  \subfloat[An orange]{\label{fig:orange}\includegraphics[width=0.4\textwidth]{images/orange}}
+  \caption{The horizontal space between the images can be adjusted.}
+\end{figure}
+Figure \ref{fig:apple} shows a picture of an apple. The most well known rival to an apple, an orange, is shown in Fig. \ref{fig:orange}.
+\pagebreak
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{images/pineapple}
+	\caption{A standalone pineapple scaled to half the text-width.}
+	\label{fig:pineapple}
+\end{figure}
+
+An important layout option is the page-break. The page was broken after the apples and oranges.
+
+\section{Code Listings}
+Here is a sample of C code with some important stuff highlighted in red.
+
+\begin{lstlisting}[caption=csddaption, label=something]
+sdd
+\end{lstlisting}
+
+\begin{lstlisting}[caption=blabla, label=amb]
+sdsd
+\end{lstlisting}
+
+% \begin{lstlisting}[language=C, emph=printf, emphstyle=\color{red}]
+% #include <stdio.h>
+% 
+% int main(int argc, char *argv[])
+% {
+% 	/* A comment */
+% 	printf("Hello World!\n");
+% 	
+% 	return 0;
+% }
+% \end{lstlisting}
+
+\section{Math}
+Latex can do inline math: $\sqrt[3]{K}$, 
+\begin{equation}
+H_{1}(z) = \frac{0.066079\left(z^2 - 1.957z + 1\right)}{z^2 - 1.978z + 0.9826}
+\end{equation}
+Text can be added thus:
+$$50 \textrm{ apples} \times 100 \textbf{ apples} = \textit{lots of apples}^2$$
+
+\begin{equation} \label{eq:someequation}
+5^2 - 5 = 20
+\end{equation}
+
+this references the equation \ref{eq:someequation}.
+
+\begin{align*}
+ f(x) &= (x+a)(x+b) \\
+ &= x^2 + (a+b)x + ab
+\end{align*}
+
+% Bibliography. The "99" allows up to 99 entries apparently.
+\begin{thebibliography}{99}
+\bibitem{ref:example} Benjamin Washington-Yule, How to LaTex, 1999, Harper Collins
+\end{thebibliography}
+
+\end{document}

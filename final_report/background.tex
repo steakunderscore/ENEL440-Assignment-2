@@ -1,0 +1,259 @@
+\section{Background}
+
+\subsection{Bayes Filter}
+Both particle and Kalman filters are types of Bayes filters. A Bayes filter,
+or \emph{recursive Bayesian estimator} and provides a probabilistic framework
+for estimation, but cannot be instantiated itself. To use terminology correctly:
+particle and Kalman filters are implementations of the generic Bayes filter. As
+such, they share very similar properties.
+
+\subsubsection{State Space}
+A Bayes filter is used for estimating the \emph{state} of a dynamic system from
+noisey sensor measurements. The dynamic system is described by the state
+vector $\textbf{x}$, and the following generic notation is used.
+
+\begin{math}
+\mathbf{x}_{t}\quad\quad\quad\textrm{state at time t} \\
+\mathbf{z}_{t}\quad\quad\quad\textrm{observation at time t} \\
+\mathbf{u}_{t}\quad\quad\quad\textrm{system input at time t}
+\end{math}
+
+Note that all of the state variables are vectors, indicating that a system can
+have multiple states, observations and inputs. To illustrate how a system can be
+decomposed into its state space consider the spring-mass-damper system shown in
+Figure \ref{fig:spring-mass-damper}. The state of the system is composed of two
+variables: position $x$ and velocity $\dot{x}$. We can use Newton's second law
+to develop a force balance equation:
+
+\begin{math}
+\sum{F} = ma \\\\
+F_{spring} = -kp \\
+F_{damper} = -C\dot{p} \\\\
+\sum{F} = ma = m\ddot{p} = -C\dot{p} -kx \\\\
+\implies m\ddot{p} + C\dot{p} + kx = u
+\end{math}
+
+And form the state vector thus:
+
+\begin{equation}
+    \mathbf{x} =
+    \begin{bmatrix}
+        p \\
+        \dot{p}
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        x_{1} \\
+        x_{2}
+    \end{bmatrix}
+\end{equation}
+
+From which we can create the state space,
+
+\begin{align*}
+    \mathbf{\dot{x}}
+    &=
+    \begin{bmatrix}
+        \dot{p} \\
+        \ddot{p}
+    \end{bmatrix} \\
+    &=
+    \begin{bmatrix}
+        \dot{x} \\
+        \frac{C}{M}\dot{p} - \frac{k}{M}p
+    \end{bmatrix} \\
+    &=
+    \begin{bmatrix}
+        x_{1} \\
+        \frac{C}{M}x_{2} - \frac{k}{M}x_{1} - u
+    \end{bmatrix} \\
+    &=
+    \begin{bmatrix}
+        0 & 1\\
+        \frac{-k}{M} & \frac{-C}{M} \\
+    \end{bmatrix}
+    \begin{bmatrix}
+        x_{1} \\
+        x_{2}
+    \end{bmatrix}
+    +
+    \begin{bmatrix}
+        0 \\
+        1
+    \end{bmatrix}
+    u
+\end{align*}
+Which implies an overall state space,
+\begin{equation}
+\mathbf{\dot{x}} = \mathbf{A}\mathbf{x} + \mathbf{B}u
+\end{equation}
+
+where
+
+\begin{math}
+    \mathbf{A} =
+    \begin{bmatrix}
+        0 & 1\\
+        \frac{-k}{M} & \frac{-C}{M} \\
+    \end{bmatrix}\textrm{,}\quad
+    \mathbf{B} =
+    \begin{bmatrix}
+        0 \\
+        1
+    \end{bmatrix}
+\end{math}
+
+We model the sensors similarly. The values of the matrices depend on which modes
+we are able to observe. In this example we have said that we can observe position,
+but not velocity. Our sensor vector is therefore simply a scalar value equal to
+the first mode (position) of the system:
+
+\begin{equation}
+    \mathbf{z} =
+    \begin{bmatrix}
+        z
+    \end{bmatrix}
+    = x_{1}
+\end{equation}
+
+and the state space equations are therefore:
+
+\begin{equation}
+    z =
+    \begin{bmatrix}
+        1 & 0
+    \end{bmatrix}
+    \begin{bmatrix}
+        x_{1} \\
+        x_{2}
+    \end{bmatrix}
+    +
+    \begin{bmatrix}
+        0 \\
+        0
+    \end{bmatrix}
+    u
+\end{equation}
+
+which we write using the usual state space notation.
+
+\begin{equation}
+z = \mathbf{C}\mathbf{x} + \mathbf{D}u
+\end{equation}
+
+Even though we have the system in state space form, it is not quite ready for
+use as a model for a Bayes filter. There is a subtle change in the form of equations
+\ref{eq:TODO} and \ref{eq:TODO} when used with a discrete system. The changes are shown here
+without justification.\footnote{TODO}
+
+\begin{equation}
+\mathbf{x_{t+1}} = \mathbf{F}\mathbf{x_{t}} + \mathbf{G}u_{t}
+\end{equation}
+
+\begin{equation}
+z_{t} = \mathbf{H}\mathbf{x_{t}} + \mathbf{J}u_{t}
+\end{equation}
+
+where
+
+\begin{math}
+    \mathbf{F} = \mathrm{\Delta t}\mathbf{A} + \mathbf{I_{4}}
+    \textrm{,}\quad\\
+    \mathbf{G} = \mathrm{\Delta t}\mathbf{B}
+    \textrm{,}\quad\\
+    \mathbf{H} = \mathbf{C}
+    \textrm{,}\quad\\
+    \mathbf{J} = \mathbf{D}
+\end{math}
+
+These are the key equations used in both the particle and Kalman filtering
+algorithms.
+
+Although the derivations of these state space forms are long-winded, the
+formation of the state space is an important step for a Bayes filter.
+
+\subsubsection{Estimation Process}
+The aim of the Bayes filter is to find the belief about the current state.
+
+\begin{math}
+Bel(\mathbf{x}_{t}) = p(\mathbf{x}_{t} | \mathbf{z}_{1}, \mathbf{z}_{2}, \dots
+, \mathbf{z}_{t})
+\end{math}
+
+that is, the probability of $\mathbf{x}_{t}$ given all the data we've seen so far.
+Roughly speaking, the belief answers the question \emph{What is the probability
+that the cart is at location x if the history of sensor measurements is
+$\mathbf{z}_{1}, \mathbf{z}_{2}, \dots, \mathbf{z}_{t}$?} for all possible
+locations.
+
+The number of observations grows with time. To make the computation tractable,
+Bayes filters assumet the dynamic system is \emph{Markov}\footnote{TODO:
+explanation of a Markov process}, the result of this is that we assume that the
+current state $\mathbf{x}_{t}$ contains all relevent information. Returning to
+the example given previously, the Markov assumption implies that sensor measurements
+depend only on an objects current physical location and that an object's location at
+time $t$ depends only on the previous state $\mathbf{x}_{t-1}$. That is, states
+before $\mathbf{x}_{t-1}$ provide no additional information under this assumption.
+
+With this assumption, the belief function simplifies to that shown in
+Equation \ref{eq:markov-belief}.
+
+\begin{equation}\label{eq:markov-belief}
+Bel(\mathbf{x}_{t}) = p(\mathbf{x}_{t} | \mathbf{z}_{t})
+\end{equation}
+
+\subsubsection{Updating the Bayes Filter}
+Whenever a sensor provides a new observation $\mathbf{z}_{t}$\footnote{TODO:
+remember that often z\_t is simpy a scalar}, the filter predicts state according
+to \ref{eq:predict}. Note that the new sensor observation is not used in this step.
+
+\begin{equation}\label{bayes-predict}
+p(\mathbf{x}_{t} | \mathbf{z}_{t-1}) = \int{p(\mathbf{x}_{t} | \mathbf{x}_{t-1})
+p(\mathbf{x}_{t} | \mathbf{z}_{t-1})\mathrm{d}\mathbf{x}_{t-1}}
+\end{equation}
+
+The filter then corrects the predicted estimate using the new sensor observation
+according to \ref{eq:update}
+
+\begin{align}\label{bayes-update}
+    p(\mathbf{x}_{t} | \mathbf{z}_{t}) &=
+    \frac
+    {p(\mathbf{z}_{t} | \mathbf{x}_{t})p(\mathbf{x}_{t} | \mathbf{z}_{t-1})}
+    {p(\mathbf{z}_{t} | \mathbf{z}_{t-1}}\\\\
+    &=
+    \alpha p(\mathbf{z}_{t} | \mathbf{x}_{t})p(\mathbf{x}_{t} | \mathbf{z}_{t-1})
+\end{align}
+
+%TODO make a comparison to Bayes Rule
+
+It is often difficult to understand exactly what this all means just by looking at
+Equations TODO through TODO, and a more qualitative description can clarify things.
+
+$p(\mathbf{z}_{t} | \mathbf{x}_{t})$ is the perceptual model. It is the probability
+of seeing a particular observation given that the system is in some state
+$\mathbf{x}_{t}$ at time $t$. Using the previous example, it describes the
+likelihood of making observation $z$ given that the cart is at location $x$.
+The distribution is a property of a given sensor.
+
+% TODO if filling required: to plots of good vs bad sensors.
+
+$p(\mathbf{x}_{t} | \mathbf{x}_{t-1})$ is sometimes referred to as the action
+model and describes the system dynamics. This is why it is essential to formulate
+a state space model of the system under examination, as this is what is used to
+formulate the distribution.
+
+At this point it is worth iterating that Bayes filters only provide a
+probabilistic framework for recursive state estimation and that implementing
+a Bayes filter required specifying both perceptual model
+$p(\mathbf{z}_{t} | \mathbf{x}_{t})$, the system dynamics
+$p(\mathbf{x}_{t} | \mathbf{x}_{t+1})$ and the representation of the Belief
+$p(\mathbf{x}_{t} | \mathbf{z}_{t})$.
+
+\subsection{The Kalman Implementation}
+
+\subsection{The Particle Filter Implementation}
+
+% TODO kalman predict and update
+% TODO particle filtering algorithm
+    
+% \section{applia
