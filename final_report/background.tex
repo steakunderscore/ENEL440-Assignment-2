@@ -250,10 +250,50 @@ $p(\mathbf{x}_{t} | \mathbf{x}_{t+1})$ and the representation of the Belief
 $p(\mathbf{x}_{t} | \mathbf{z}_{t})$.
 
 \subsection{The Kalman Implementation}
+The Kalman filter implementation utilises the specified state space system
+model described in Section \ref{sec:TODO}. It is assumed that process noise
+is added to the state update model thus:
+
+\begin{equation}
+\mathbf{x}_{t+1} = \mathbf{Fx}_{t} \mathbf{Bu}_{t} + \mathbf{w}_t
+\end{equation}
+
+Where $\mathbf{w}_t$ is zero mean, normally-distributed noise with convariance
+$\mathbf{Q}$, i.e., $\mathbf{w}_{t} \sim N(0, \mathbf{Q})$.
+
+Measurements are made by observing system state thus,
+
+\begin{equation}
+\mathbf{z}_{t} = \mathbf{Hx}_{t} + \mathbf{v}_t
+\end{equation}
+
+where $\mathbf{v}_{t} \sim N(0, \mathbf{R})$ and $\mathbf{R}$ is the
+noise convariance.
+
+\subsubsection{Prediciton}
+The next state is predicted blindly according to supplied state model,
+
+\begin{equation}
+\mathbf{x}_{t|t-1} = \mathbf{Fx}_{t-1|t-1} + \mathbf{Bu}_{t}
+\end{equation}
+
+and the estimate covariance updated according to,
+
+\begin{equation}
+\mathbf{P}_{t|t-1} = \mathbf{FP_{t-1|t-1}F^{T}} + \mathbf{Q}
+\end{equation}
+
+\subsubsection{Updating}
+
+\begin{math}
+\tilde{\textbf{y}}_k = \textbf{z}_k - \textbf{H}_k\hat{\textbf{x}}_{k|k-1}\\
+\textbf{S}_k = \textbf{H}_k \textbf{P}_{k|k-1} \textbf{H}_k^\text{T} + \textbf{R}_k\\
+\textbf{K}_k = \textbf{P}_{k|k-1}\textbf{H}_k^\text{T}\textbf{S}_k^{-1}\\
+\hat{\textbf{x}}_{k|k} = \hat{\textbf{x}}_{k|k-1} + \textbf{K}_k\tilde{\textbf{y}}_k\\
+\textbf{P}_{k|k} = (I - \textbf{K}_k \textbf{H}_k) \textbf{P}_{k|k-1}
+\end{math}
 
 \subsection{The Particle Filter Implementation}
 
-% TODO kalman predict and update
 % TODO particle filtering algorithm
     
-% \section{applia

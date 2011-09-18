@@ -212,7 +212,7 @@ prediction. It incorporates the predicted state model and the observation. Natur
 if these values were identical then there is no change in the update step.
 
 In both of the two steps the noise was assumed to be Gaussian. During testing,
-we simulated this noise by adding randomally distrubuted random numbers to both
+we simulated this noise by adding randomly distributed random numbers to both
 the sensor measurements and the state update equations.
 
 \subsection{Results}
@@ -240,16 +240,16 @@ maintained. This can be put down to the simplicity of the actual system under
 examination. A ball bouncing under gravity has only a single degree of freedom
 and although the model is incorrect for half of duration of the video (while
 the ball is rebounding), the measurements are still so clear that we can track
-the ball accuratly.
+the ball accurately.
 
 In order to prove that we simply were not following the measurements and
 disregarding the state update, a final test was constructed where the measurement
 noise was given an extremely high value ($\sigma = 10$) and the process noise set
-to zero. When the simulation was run, tracking was started and mainatined as
+to zero. When the simulation was run, tracking was started and maintained as
 soon as the ball entered the frame and was moving downward, but was lost entirely
-when the ball hit the ground. This is an encourageing result and shows two things:
+when the ball hit the ground. This is an encouraging result and shows two things:
 \begin{compactitem}
-\item Recursive Bayesian estiamte relies on both the state model and the observatiosn
+\item Recursive Bayesian estimate relies on both the state model and the observations
 \item If one of: the measurement noise is high or the model inaccurate, then the
 other must be even more accurate to make up.
 \end{compactitem}
@@ -259,7 +259,7 @@ other must be even more accurate to make up.
 \subsubsection{Obstructions}
 A second test of the filtering algorithm is to add an obstruction to the image.
 This means that the object (ball) that we are trying to track ``disappears" from
-for one or more frames then comes back into view. Unfortunatally, the videos
+for one or more frames then comes back into view. Unfortunately, the videos
 had already been taken by this stage and time did not permit a reshoot with
 an obstruction added. We were able to simulate this however, by simply dropping
 measurements for one or more frames.
@@ -271,10 +271,10 @@ downward direction. This is indeed what was observed but it was interesting to
 note just how well tracking was maintained moving past the ``obstruction" in
 the downward direction. As soon as the ball disappeared, i.e., no measurement was
 available, the state model of the system took over and tracked the ball down
-though the obstruction. This highlights the strentgh of the Bayes filter, but also
+though the obstruction. This highlights the strength of the Bayes filter, but also
 the importance of an accurate model.
 
-\subsection{Particel Filter Implementaion}
+\subsection{Particle Filter Implementation}
 Unfortunately the algorithm developed for the particle filter method did not work.
 It is still not known why but we can make some assumptions about what would
 have happened:
@@ -286,4 +286,134 @@ due to the particle filter's ability to deal with both Gaussian and non-Gaussian
 noise.
 \end{compactitem}
 
-% ideas: dropping measurements
+\section{Application: Filtering}
+We developed a second example in order to further test the properties of Bayes
+filters. The image tracking example, while realistic, did not allow control of
+the system, as it was simply a collection of frames that could not be changed.
+Our second example involved developing a system that we completely specify, i.e.,
+we have exact knowledge of its dynamical model because we created it.
+
+The system used in the example is the spring-mass-damper described in Section
+\ref{sec:TODO}. The state space derivation is already given. We could now
+analyse this system in a way we could not with the image tracking example. The
+goal of this example can be stated thus: given a state-space model that is
+very accurate (by definition it is perfectly accurate), and a random input
+into this system, how much sensor noise can we tolerate before tracking is lost?
+
+\subsection{Noise}
+Measurement noise in the system is by definition zero, as we can observe the
+state without error. To simulate noise in the measurements, a normally-distributed
+random number was added to the measurement at each time step. Manually adding this
+error also means that we have knowledge of the noise variance (as we specify it).
+
+\subsection{Results}
+The Bayes filter was implemented as a Kalman filter becuase of the difficulties
+obtaining resilts using the particle filter implementaiton.
+
+Figure \ref{fig:filter} shows the results of the Bayes filter with extremely
+high measurement noise ($\sigma = 10$). The true state is shown in Figure
+\ref{fig:true-state}. It is a damped system starting at position $p = 10$ with
+an additional random input, which is unknown to the sensor. Figure \ref{fig:measured-state}
+shows the measured state. Because of the amount of noise it is almost impossible
+to make out the original signal\footnote{This is typical of signals obtained
+from patients in which the blood-glucose level is to be tracked.}. Finally,
+Figure \ref{fig:estimated-state} shows the output of the Bayes filter.
+
+\begin{figure}[h]
+\centering
+\subfloat[A]{
+    \label{fig:untouched}
+    \includegraphics[width=0.6\textwidth]{images/true-state}
+}
+\subfloat[B]{
+    \label{fig:subtracted}
+    \includegraphics[width=0.6\textwidth]{images/measured-state}
+}
+\subfloat[C]{
+    \label{fig:marked}
+    \includegraphics[width=0.6\textwidth]{images/estimated-state}
+}
+\caption{A standalone pineapple scaled to half the text-width.}
+\label{fig:filter}
+\end{figure}
+
+The output maintains remarkably close tracking of the input, or stated in a
+way more fitting for the example: the noise has been almost completely filtered
+from the measured signal. As remarkable as this example be, it is contrived and
+it is important to note the following:
+\begin{compactitem}
+\item Measurement noise is randomly distributed and we are aware of this fact.
+\item We know the measurement noise variance \emph{exactly}.
+\item We know the process noise variance \emph{exactly}.
+\end{compactitem}
+If either of these change, then tracking is expected to become less accurate, or
+at worst, lost completely. To test this hypothesis, the true noise variance was
+changed to ($\sigma = 5$) while our belief of the variance was in fact at
+($\sigma = 2$). The result is shown in Figure \ref{fig:filter-bad}. It is
+visually obvious that the state is not being tracked accurately, highlighting
+the importance of characterising the sensors so that the noise variance is
+known.
+
+\begin{figure}[h]
+\centering
+\subfloat[A]{
+    \label{fig:untouched}
+    \includegraphics[width=0.5\textwidth]{images/true-state-bad}
+}
+\subfloat[B]{
+    \label{fig:subtracted}
+    \includegraphics[width=0.5\textwidth]{images/estimated-state-bad}
+}
+\caption{A standalone pineapple scaled to half the text-width.}
+\label{fig:filter-bad}
+\end{figure}
+
+The relative error between the true and estimated states for different values
+of noise variance error is shown in Figure \ref{fig:noise-error}. As expected,
+the more incorrect we are about the sensor noise variance, the worse tracking
+becomes.
+
+\begin{figure}[h]
+\centering
+\subfloat[A]{
+    \label{fig:untouched}
+    \includegraphics[width=0.3\textwidth]{images/error-state-0}
+}
+\subfloat[B]{
+    \label{fig:subtracted}
+    \includegraphics[width=0.3\textwidth]{images/error-state-10}
+}
+\subfloat[C]{
+    \label{fig:marked}
+    \includegraphics[width=0.3\textwidth]{images/error-state-20}
+}
+\caption{A standalone pineapple scaled to half the text-width.}
+\label{fig:filter}
+\end{figure}
+
+\subsubsection{Particle Filter Implementation}
+Even though the particle filter implementation did not work, we attempted to
+create a non-linear state model, expecting the Kalman filter to fail because
+of its inability to handle non-linearity in the system model.
+
+The state model was changed to a simple non-linear system modelling a pendulum.
+The derivation is omitted and only the final state-space equations are shown.
+
+\begin{equation}
+\mathbf{x}(t+1) =
+\begin{pmatrix}
+x_{1}(t+1) \\ x_{2}(t+1)
+\end{pmatrix}
+=
+\mathbf{f}(t, \mathbf{x}(t)) =
+\begin{pmatrix}
+x_{2}(t) \\ \alpha \sin x_{1}(t) - \beta x_{2}(t)
+\end{pmatrix}
+\end{equation}
+
+The same procedure was used for this new non-linear system. Unexpectedly however,
+the Kalman implementation of the Bayes filter continued to work correctly.
+It is unknown why this happened, but one assumption to be made is that if the
+Kalman implementation functioned correctly, then the particle filter implementation
+would certainly function too.
+
