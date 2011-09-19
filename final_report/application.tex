@@ -52,7 +52,7 @@ return object
 
 The measurement routine is in essence a background-subtraction, followed by some
 inbuilt Matlab functions for identifying similar regions\footnote{Specifically,
-\texttt{bwmorph}, \texttt{bwlabel}, \texttt{regionprops}}. The result of a
+\texttt{bwmorph()}, \texttt{bwlabel()} and \texttt{regionprops()}}. The result of a
 typical measurement for a particular frame is shown in Figure \ref{fig:observation}.
 
 \begin{figure}[h]
@@ -141,8 +141,7 @@ y_{t+1} = y_{t} + \dot{y}_{t}
 \end{align}
 
 That is, at each time step the positions increment by the current velocities.
-The velocities are themselves updated according
-\footnote{The reader may notice a
+The velocities are themselves updated according\footnote{The reader may notice a
 perceived discrepancy in the units
 at this point. It was stated that velocities are in pixels/sec, but the time
 steps occur much faster than this. This is precisely the reason for the
@@ -299,9 +298,9 @@ we have exact knowledge of its dynamical model because we created it.
 The system used in the example is the spring-mass-damper described in Section
 \ref{sec:state-space}. The state space derivation is already given. We can now
 analyse this system in a way we could not with the image tracking example. The
-goal of this application example can be stated thus: given a state-space model that is
+goal of this application example can be stated thus: \emph{given a state-space model that is
 very accurate (by definition it is perfectly accurate), and a random input
-into this system, how much sensor noise can we tolerate before tracking is lost?
+into this system, how much sensor noise can we tolerate before tracking is lost?}
 
 \subsection{Noise}
 Measurement noise in the system is by definition zero, as we can observe the

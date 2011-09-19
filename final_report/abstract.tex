@@ -1,11 +1,17 @@
+
 \begin{abstract}
-This paper details the particle filter. A particle filter is a class of
-sophisticated sequential estimation techniques for estimating the state of a
-dynamical system. To introduce a Particle filter, first the Bayes filter is
-introduced which encompasses both the Particle filter and the Kalman filter.
-The implementation of a particle filter is examined and compared to a Kalman
-filter where results are compared and concluded. Testing was preformed on a 
-video of a spherical ball dropping and bouncing.
+This report describes the general Bayes filter and discusses two implementations
+thereof: the Kalman filter and the particle filter. The framework for the Bayes filter is discussed
+in detail, including the formulation of a state space model for a system. Two
+application examples are chosen and simulated: image tracking and noise filtering.
 
+The results for each are in line with expectations: the filter performance depends
+on the accuracy of the model and the amount of measurement noise. Only the Kalman
+filter implementation is functional, and it is not known why the particle filter
+routine does not work. The implementation of the particle filter is examined
+and compared to the Kalman implementation from a theoretical viewpoint. 
+
+The results of the second example show that the Bayes filter can handle systems
+where the noise is very high. It concludes with a short discussion where it is
+concluded that the Kalman filter is sufficient for the majority of situations.
 \end{abstract}
-

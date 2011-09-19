@@ -2,7 +2,7 @@
 
 % Margins
 % \usepackage[margin=2.5cm]{geometry}
-\usepackage[top=1in,right=1.3in,left=1.3in,bottom=1in]{geometry}
+\usepackage[top=1in,right=0.7in,left=0.7in,bottom=1in]{geometry}
 
 % Headers and footers.
 % useful options:
@@ -95,13 +95,16 @@
 \author{Benjamin Washington-Yule}
 
 % One or tather.
-\maketitle
-% \input{title}
+%\maketitle
+\input{title}
 
 %\begin{abstract}
 %The best abstract in the world.
 %\end{abstract}
+\vspace*{\fill}
 \input{abstract}
+\vspace*{\fill}
+\pagebreak
 
 \input{introduction}
 \input{background}
@@ -117,6 +120,17 @@ on particle filters for on-line non-linear/non-gaussian baysian tracking.
 \bibitem{ref:2} P. M. Djuric, J. H. Kotecha, J.Zhang, Y. Huang, T. Ghirmai, M.
 F. Bugallo, J. Miguez. Particle Filtering. \emph{IEEE Transactions on Signal
 Processing, 20(5):19-37, September 2003.}
+
+\bibitem{ref:3} A. Doucet, S. J. Godsill, and C. Andrieu. 
+On sequential monte carlo sampling methods for bayesian filtering.
+\emph{Statistics and Computing, 10:197-208, 2003.}
+
+\bibitem{ref:4} D. Fox, J. Hightower, L. Liao, D. Schulz and G. Borriello.
+Bayesian Filtering for Location Estimation.
+\emph{IEEE Transactions on Signal
+Processing, 1536-1268, 2003.}
+
+
 \end{thebibliography}
 
 \end{document}

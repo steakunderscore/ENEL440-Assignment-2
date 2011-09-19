@@ -1,11 +1,11 @@
 \section{Background}\label{sec:background}
 
 Both particle and Kalman filters are types of \emph{recursive Bayesian estimators},
-or \emph{Bayes filters}. A Bayes filter provides a probabilistic framework
-for estimation, but cannot be instantiated itself. In other words,
+or \emph{Bayes filters} \cite{ref:4}. A Bayes filter provides a probabilistic framework
+for estimation, but cannot be instantiated itself \cite{ref:3}. In other words,
 particle and Kalman filters are both implementations of the generic Bayes filter.
 As such, they share very similar properties, and a designer must go through the
-same initial steps for both.
+same initial steps for both.\cite{ref:4}
 
 To avoid confusion, the \emph{system} refers to the system whose state we are
 attempting to estimate. The Bayes filter uses a \emph{dynamical model} and
@@ -196,7 +196,9 @@ Even though we have the system in state space form, it is not quite ready for
 use as a model for a Bayes filter. There is a subtle change in the form of equations
 \ref{eq:sys-ss} and \ref{eq:obs-ss} when used to model a discrete system,
 such as when modelling using Matlab. The
-changes are shown here without justification.\footnote{TODO}
+changes are shown here without justification.\footnote{The reason is to do with
+    the fact that a finite time step must be used when implemented digitally.
+}
 
 \begin{equation}
 \mathbf{x_{t+1}} = \mathbf{F}\mathbf{x_{t}} + \mathbf{G}u_{t}
@@ -209,7 +211,7 @@ z_{t} = \mathbf{H}\mathbf{x_{t}} + \mathbf{J}u_{t}
 where
 %TODO align these
 \begin{equation*}
-    \mathbf{F} = \mathrm{\Delta t}\mathbf{A} + \mathbf{I_{4}}
+    \mathbf{F} = \mathrm{\Delta t}\mathbf{A} + \mathbf{I}
     \quad\quad\mathbf{H} = \mathbf{C}
 \end{equation*}
 \begin{equation*}
@@ -236,8 +238,8 @@ $\mathbf{z}_{1}, \mathbf{z}_{2}, \dots, \mathbf{z}_{t}$}?
 The number of observations grows with time, and will get large very quickly
 (withing a few seconds) in any system where measurements are taken at a high rate.
 To make the computation tractable,
-Bayes filters assume that the dynamic system is a \emph{Markov} process\footnote{TODO:
-explanation of a Markov process}. The result of this assumption is that we can
+Bayes filters assume that the dynamic system is a \emph{Markov} process.\cite{ref:4}
+The result of this assumption is that we can
 assume that the
 current state $\mathbf{x}_{t}$ contains all the information we need. Using
 the cart example given previously, the Markov assumption implies that sensor measurements
@@ -255,7 +257,7 @@ Bel(\mathbf{x}_{t}) = p(\mathbf{x}_{t} | \mathbf{z}_{t})
 
 \subsubsection{Updating the Bayes Filter}\label{sec:updating-bayes}
 Whenever a sensor provides a new observation\footnote{
-    Although written as a vector generally it is worth noting that in many systems,
+    Although written as a vector generally, it is worth noting that in many systems,
     including the cart system above, there is only a single observation and the
     observation vector has only one element, i.e., it is a scalar}
 $\mathbf{z}_{t}$, the filter predicts state according
@@ -351,11 +353,11 @@ The steps to update the Kalman filter are as follows,
 
 The \emph{measurement residual} is calculated,
 \begin{equation*}
-\tilde{\textbf{z}}_t = \textbf{z}_t - \textbf{H}_t\textbf{x}_{t|t-1}\\
+\tilde{\textbf{z}}_t = \textbf{z}_t - \textbf{H}\textbf{x}_{t|t-1}\\
 \end{equation*}
 and this is used to calculate the \emph{residual covariance},
 \begin{equation*}
-\textbf{S}_k = \textbf{H}_k \textbf{P}_{t|t-1} \textbf{H}_k^\text{T} + \textbf{R}\\
+\textbf{S}_k = \textbf{H} \textbf{P}_{t|t-1} \textbf{H}^\text{T} + \textbf{R}\\
 \end{equation*}
 which in turn allows calculation of the \emph{optimal Kalman gain},
 \begin{equation*}
@@ -367,7 +369,7 @@ Finally, we update the state estimate,
 \end{equation*}
 and the estimate covariance.
 \begin{equation*}
-\textbf{P}_{t|t} = (I - \textbf{K} \textbf{H}) \textbf{P}_{t|t-1}
+\textbf{P}_{t|t} = (\mathbf{I} - \textbf{K} \textbf{H}) \textbf{P}_{t|t-1}
 \end{equation*}
 
 The proof of why this works is beyond the scope of this report, and the above
