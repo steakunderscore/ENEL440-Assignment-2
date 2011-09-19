@@ -1,4 +1,4 @@
-\section{Application One: Image Tracking}
+\section{Application One: Image Tracking}\label{sec:image-tracking}
 Image tracking is a common application for a Bayes filter. A certain aspect of, or
 object in an image is to be tracked, and the goal is to use a state
 model as well as sensor measurements, to estimate its state. In the case of image
@@ -51,8 +51,8 @@ return object
 \end{lstlisting}
 
 The measurement routine is in essence a background-subtraction, followed by some
-inbuilt Matlab functions for identifying similar regions\footnote{TODO quick
-explanation of the functions bwmorph, bwlabel, regionprops}. The result of a
+inbuilt Matlab functions for identifying similar regions\footnote{Specifically,
+\texttt{bwmorph}, \texttt{bwlabel}, \texttt{regionprops}}. The result of a
 typical measurement for a particular frame is shown in Figure \ref{fig:observation}.
 
 \begin{figure}[h]
@@ -190,7 +190,7 @@ g
 \mathbf{Ax}_{t} + \mathbf{Bu}_{t}
 \end{align}
 % TODO check this, its magic
-Where (25) is the usual state-space form.
+Where (28) is the usual state-space form.
 
 \subsection{Filtering Steps and Noise}
 The Kalman filter implementation of the Bayes filter was used for testing. Under
@@ -259,8 +259,6 @@ when the ball hit the ground. This is an encouraging result and shows two things
 other must be even more accurate to compensate.
 \end{compactitem}
 
-% TODO qualatative table if filler needed
-
 \subsubsection{Obstructions}
 A second test of the filtering algorithm is to add an obstruction to the image.
 This means that the object (ball) that we are trying to track ``disappears"
@@ -279,7 +277,7 @@ available, the state model of the system took over and tracked the ball down
 though the obstruction. This highlights the strength of the Bayes filter, but also
 the importance of an accurate model.
 
-\subsection{Particle Filter Implementation} % TODO Gah...
+\subsection{Particle Filter Implementation}
 Unfortunately the algorithm developed for the particle filter method did not work.
 It is still not known why but we can make some assumptions about what would
 have happened:
