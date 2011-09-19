@@ -357,5 +357,66 @@ and the estimate covariance updated according to,
 
 \subsection{The Particle Filter Implementation}
 
-% TODO particle filtering algorithm
-    
+% TODO particle filtering algorithm - Check this
+A very commonly used algorithm used to implement the particle filter is
+Sequential Importance Resampling (SIR). The SIR is the original particle filter
+algorithm which approximates the filtering distribution 
+
+\begin{equation}
+p(x_k|y_0,\ldots,y_k)
+\end{equation}
+
+by a weighted set of $P$ particles
+
+\begin{equation}
+\{(w^{(L)}_k,x^{(L)}_k)~:~L\in\{1,\ldots,P\}\}.
+\end{equation}
+
+The \emph{importance weights} $w^{(L)}_k$ are approximations to the relative
+posterior probabilities (or densities) of the particles such that 
+$\sum_{L=1}^P w^{(L)}_k = 1$. The values of the \emph{importance weights} is
+evaluated to give $w^{(L)}_k$. As in importance sampling, the expectation of a
+function $f(\cdot)$ can be approximated as a weighted average
+
+\begin{equation}
+\int f(x_k) p(x_k|y_0,\dots,y_k) dx_k \approx \sum_{L=1}^P w^{(L)} f(x_k^{(L)}).
+\end{equation}
+
+Because the $\int f(x_k) p(x_k|y_0,\dots,y_k) dx_k$ is very hard to find, we use
+the approximation as a replacement. 
+
+\subsubsection{Implementation}
+The implementation of the algorithm is rather simple (compared to other particle
+filtering algorithms) and it uses composition and rejection.  To generate a
+single sample $x$ at $k$ from $p_{x_k|y_{1:k}}(x|y_{1:k})$
+
+\begin{enumerate}
+\item Set $p = 1$
+\item Uniformly generate $L$ from $\{1,..., P\}$
+\item Generate a test $\hat{x}$ from its distribution
+  $p_{x_k|x_{k-1}}(x|x_{k-1|k-1}^{(L)})$
+\item Generate the probability of $\hat{y}$ using $\hat{x}$ from
+  $p_{y|x}(y_k|\hat{x})$ where $y_k$ is the measured value
+\item Generate another uniform $u$ from $[0, m_k]$
+\item Compare $u$ and $p\left(\hat{y}\right)$
+\item
+\begin{enumerate}
+\item If u is larger then repeat from step 2
+\item If u is smaller then save $\hat{x}$ as $x_{k|k}^{(p)}$ and increment p
+\end{enumerate}
+\item If p > P then quit
+\end{enumerate}
+
+The goal is to generate $P$ \emph{particles} at $k$ using only the particles from
+$k-1$. This requires that a Markov equation can be written (and computed) to
+generate a $x_k$ based only upon $x_{k-1}$. This algorithm uses composition of
+the $P$ particles from $k-1$ to generate a particle at $k$ and repeats (steps 2-6)
+until $P$ particles are generated at $k$.
+
+This can be more easily visualized if $x$ is viewed as a two-dimensional array.
+One dimension is $k$ and the other dimensions is the particle number.  For
+example, $x(k,L)$ would be the $L^{th}$ particle at $k$ and can also be written
+$x_k^{(L)}$ (as done above in the algorithm).  Step 3 generates a ''potential''
+$x_k$ based on a randomly chosen particle ($x_{k-1}^{(L)}$) at time $k-1$ and
+rejects or accepts it in step 6.  In other words, the $x_k$ values are generated
+using the previously generated $x_{k-1}$.
