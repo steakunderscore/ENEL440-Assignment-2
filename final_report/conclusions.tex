@@ -1,13 +1,69 @@
 \section{Conclusions}
 %TODO
-planning:
+The results observed for both application examples are in line with what was
+expected, with the exception of the Kalman filter implementation's not failing
+when presented with a non-linear system model.
 
-a bayes filter is only accurate as the model and the characterisation of the noise
+The image tracking application was successful despite the overly simplistic 
+model used. However, it is important not to draw unwarranted conclusions 
+from this example and assume that an
+inaccurate system model will not affect the Bayes filter's ability to track an
+image. On the contrary, the results show that an inaccurate model is
+more detrimental than high measurement noise. If the first application example 
+was even slightly
+more complex, e.g., giving the ball a second degree of freedom, then our
+overly simplistic model that only takes gravity into account would certainly not
+work as intended.
 
-the particle filter impl. is difficult to implement
+The second filtering application example showed that we are able to obtain very accurate tracking 
+(filtering) even in the presence of atypically high sensor noise, but that this
+is only because we can characterize the noise accurately. We conclude that 
+recursive Bayesian estimation is an extremely powerful tool, but that its power
+depends on
+\begin{compactitem}
+\item The accuracy of the sensor model.
+\item The accuracy of the dynamical model.
+\end{compactitem}
+i.e., a Bayes filter is only as accurate as the model and the characterization 
+of the noise.
 
-kalman and pericle filters perform sim.
+If either of these are below a certain threshold (dependent on the situation) 
+then the other must be very accurate to compensate or tracking will be lost
+entirely.
 
-it is suspected
+\subsection{Particle Filter Implementation}
+We conclude that the particle filter implementation of the Bayes filter is 
+difficult to implement at best, especially in Matlab. We come to this conclusion
+after observing the following:
+\begin{compactitem}
+\item There is very little reference material on the internet about particle filters
+in software, the few that do exist are implemented in C.
+\item Our Matlab implementation did not appear to work.
+\item Many papers that mention particle filtering, in fact write the implementation
+using an alternate (usually Kalman) implementation.
+\end{compactitem}
+It should be pointed out that we are unsure whether our particle filter implementation
+was close to, or far from functioning. Given more time, it would be desirable to 
+investigate this further.
 
-if the ball is modeleed as real then pf m,ight work where kalman wont
+Even without a working implementation, we have still built the framework for a
+particle filter implementation. The system, dynamical and noise models are
+all complete, and with further work, the particle filter predict and update
+routines could easily be inserted into the code.
+
+From all evidence we conclude that for all examples presented in this report, 
+the particle filter implementation would produce results equal to or better than
+our test Kalman implementation.
+
+One point to note about the application described in Section \ref{sec:image-tracking}
+is that if were we to employ a more accurate model for the balls motion, e.g., 
+a model that takes into account the impulse from hitting the ground and a sudden change in velocity,
+then it would likely become a very non-linear system which may eventually 
+cause the Kalman implementation may break down, and a particle filter become necessary.
+However, we have also observed that the Kalman filter can handle non-linearities so 
+the particular threshold is unknown.
+
+It appears that for most applications, the Kalman filter performs 
+satisfactorily, even in the presence of slight non-linearity in the
+system model. However, we assume that there exist models of sufficient complexity
+that will benefit from the particle filter method.
