@@ -347,20 +347,38 @@ and the estimate covariance updated according to,
 
 \subsubsection{Updating}
 
-\begin{math}
-\tilde{\textbf{y}}_k = \textbf{z}_k - \textbf{H}_k\hat{\textbf{x}}_{k|k-1}\\
-\textbf{S}_k = \textbf{H}_k \textbf{P}_{k|k-1} \textbf{H}_k^\text{T} + \textbf{R}_k\\
-\textbf{K}_k = \textbf{P}_{k|k-1}\textbf{H}_k^\text{T}\textbf{S}_k^{-1}\\
-\hat{\textbf{x}}_{k|k} = \hat{\textbf{x}}_{k|k-1} + \textbf{K}_k\tilde{\textbf{y}}_k\\
-\textbf{P}_{k|k} = (I - \textbf{K}_k \textbf{H}_k) \textbf{P}_{k|k-1}
-\end{math}
+The steps to update the Kalman filter are as follows,
+
+The \emph{measurement residual} is calculated,
+\begin{equation*}
+\tilde{\textbf{z}}_t = \textbf{z}_t - \textbf{H}_t\textbf{x}_{t|t-1}\\
+\end{equation*}
+and this is used to calculate the \emph{residual covariance},
+\begin{equation*}
+\textbf{S}_k = \textbf{H}_k \textbf{P}_{t|t-1} \textbf{H}_k^\text{T} + \textbf{R}\\
+\end{equation*}
+which in turn allows calculation of the \emph{optimal Kalman gain},
+\begin{equation*}
+\textbf{K} = \textbf{P}_{t|t-1}\textbf{H}^\text{T}\textbf{S}_t^{-1}\\
+\end{equation*}
+Finally, we update the state estimate,
+\begin{equation*}
+\hat{\textbf{x}}_{t|t} = \hat{\textbf{x}}_{t|t-1} + \textbf{K}\tilde{\textbf{z}}_t\\
+\end{equation*}
+and the estimate covariance.
+\begin{equation*}
+\textbf{P}_{t|t} = (I - \textbf{K} \textbf{H}) \textbf{P}_{t|t-1}
+\end{equation*}
+
+The proof of why this works is beyond the scope of this report, and the above
+equations are only included to give an idea of what was implemented in Matlab.
 
 \subsection{The Particle Filter Implementation}
 
 % TODO particle filtering algorithm - Check this
-A very commonly used algorithm used to implement the particle filter is
-Sequential Importance Resampling (SIR). The SIR is the original particle filter
-algorithm which approximates the filtering distribution 
+A commonly used algorithm used to implement the particle filter is
+\emph{sequential importance resampling} (SIR). The SIR algorithm is the 
+original particle filter algorithm and approximates the filtering distribution
 
 \begin{equation}
 p(x_k|y_0,\ldots,y_k)
@@ -382,8 +400,12 @@ function $f(\cdot)$ can be approximated as a weighted average
 \int f(x_k) p(x_k|y_0,\dots,y_k) dx_k \approx \sum_{L=1}^P w^{(L)} f(x_k^{(L)}).
 \end{equation}
 
-Because the $\int f(x_k) p(x_k|y_0,\dots,y_k) dx_k$ is very hard to find, we use
-the approximation as a replacement. 
+The integral is not guaranteed to be computationally tractable, and in the 
+situations where it is not, the discrete measure may offer an alternative
+that is indeed tractable.
+
+% Because the $\int f(x_k) p(x_k|y_0,\dots,y_k) dx_k$ is very hard to find, we use
+% the approximation as a replacement. 
 
 \subsubsection{Implementation}
 The implementation of the algorithm is rather simple (compared to other particle
@@ -404,7 +426,7 @@ single sample $x$ at $k$ from $p_{x_k|y_{1:k}}(x|y_{1:k})$
 \item If u is larger then repeat from step 2
 \item If u is smaller then save $\hat{x}$ as $x_{k|k}^{(p)}$ and increment p
 \end{enumerate}
-\item If p > P then quit
+\item If $p > P$ then quit
 \end{enumerate}
 
 The goal is to generate $P$ \emph{particles} at $k$ using only the particles from
