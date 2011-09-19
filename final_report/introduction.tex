@@ -1,15 +1,20 @@
 \section{Introduction}
-The use of particle filters in signal processing is a new area of ongoing
-research. The particle filter is a type of Bayes filter, and is closely related
-to another type of Bayes filter, the Kalman filter. Particle filters find
-applications in similar areas as the Kalman filter, that is:
+The use of particle filters in signal processing is a comparatively new area of
+research. The particle filter is a type of \emph{recursive Bayesian estimator},
+also known as a \emph{Bayes filter}, and is closely related to another type
+of Bayes filter called the \emph{Kalman filter}. Bayes filters find
+applications in a wide range of areas, which includes among others,
 \begin{compactitem}
-\item TODO
-\item TODO
+\item Robotics, to infer position and orientation.
+\item Computer vision, to track objects.
+\item Medical fields, to extract information from noisy data.
 \end{compactitem}
+A Bayes filter is used in sensor and data fusion. It allows sensor measurements
+to be combined with a state model to accurately track the state of a system.
+
 The particle filter differs from the Kalman in the assumptions that are made
 about the underlying system model and sensor noise. A more rigorous discussion
-of these differences is found in Section \ref{sec:TODO} but can be generally
-described as having looser requirements, i.e., fewer assumptions need to be made
-about the model and sensor noise for a particle filter. This may mean that in
-some cases a particle filter will succeed where a Kalman fails.
+of these differences is found in Section \ref{sec:background} but the particle filter
+can be generally described as having looser requirements, i.e., fewer
+assumptions must be made about the model and sensor noise for a particle filter.
+This may mean that in some cases a particle filter will succeed where a Kalman fails.

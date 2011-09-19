@@ -1,17 +1,24 @@
-\section{Background}
+\section{Background}\label{sec:background}
 
-\subsection{Bayes Filter}
-Both particle and Kalman filters are types of Bayes filters. A Bayes filter,
-or \emph{recursive Bayesian estimator}, provides a probabilistic framework
-for estimation, but cannot be instantiated itself. To use terminology correctly:
-particle and Kalman filters are implementations of the generic Bayes filter. As
-such, they share very similar properties.
+Both particle and Kalman filters are types of \emph{recursive Bayesian estimators},
+or \emph{Bayes filters}. A Bayes filter provides a probabilistic framework
+for estimation, but cannot be instantiated itself. In other words,
+particle and Kalman filters are both implementations of the generic Bayes filter.
+As such, they share very similar properties, and a designer must go through the
+same initial steps for both.
 
-\subsubsection{State Space}
+To avoid confusion, the \emph{system} refers to the system whose state we are
+attempting to estimate. The Bayes filter uses a \emph{dynamical model} and
+\emph{observations} to achieve this. Depending on the context, both
+\emph{observations} and \emph{sensor measurements} are used in the text, and
+mean the same thing.
+
+\subsection{State Space}\label{sec:state-space}
 A Bayes filter is used for estimating the \emph{state} of a dynamic system from
-noisey sensor measurements. The dynamic system is described by the state
+noisy sensor measurements. The dynamic system is described by the state
 vector $\textbf{x}$, and the following generic notation is used.
 
+%TODO center this math
 \begin{math}
 \mathbf{x}_{t}\quad\quad\quad\textrm{state at time t} \\
 \mathbf{z}_{t}\quad\quad\quad\textrm{observation at time t} \\
@@ -20,20 +27,51 @@ vector $\textbf{x}$, and the following generic notation is used.
 
 Note that all of the state variables are vectors, indicating that a system can
 have multiple states, observations and inputs. To illustrate how a system can be
-decomposed into its state space consider the spring-mass-damper system shown in
-Figure \ref{fig:spring-mass-damper}. The state of the system is composed of two
-variables: position $x$ and velocity $\dot{x}$. We can use Newton's second law
+decomposed into its state space, consider the spring-mass-damper system shown in
+Figure \ref{fig:spring-mass-damper}.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.6\textwidth]{images/cart-system}
+\caption{Spring-mass-damper system. $k$ and $C$ are the spring and damping
+    coefficients respectively, $p$ is the position referenced from zero and $F$
+    the applied force.
+}
+\label{fig:spring-mass-damper}
+\end{figure}
+
+The cart shown in the Figure is anchored
+to the wall by a spring and damper. It slides on a frictionless surface and has
+unity mass. There is an input $u = F$ which excites the system.
+
+We arbitrarily decide that the state of the system is composed of the two
+variables\footnote{Note that we could have chosen any property of the system
+as a state variable. Such a simple model offers few options however.}
+: position $p$ and velocity $\dot{p}$. We can then use Newton's second law,
+$\sum{F} = ma$,
 to develop a force balance equation:
 
-\begin{math}
-\sum{F} = ma \\\\
+\begin{displaymath}
 F_{spring} = -kp \\
+\end{displaymath}
+\begin{displaymath}
 F_{damper} = -C\dot{p} \\\\
-\sum{F} = ma = m\ddot{p} = -C\dot{p} -kx \\\\
-\implies m\ddot{p} + C\dot{p} + kx = u
-\end{math}
+\end{displaymath}
 
-And form the state vector thus:
+\begin{align*}
+\sum{F} &= ma \\ &= m\ddot{p} \\
+&= -C\dot{p} -kp + u
+\end{align*}
+
+Which allows us to write a single differential equation to describe the dynamics
+of the system.
+
+\begin{equation}
+\implies m\ddot{p} + C\dot{p} + kp = u
+\end{equation}
+
+The system state consists of position $p$ and velocity $\dot{p}$, and we form
+the state vector thus:
 
 \begin{equation}
     \mathbf{x} =
@@ -56,17 +94,17 @@ From which we can create the state space,
     \begin{bmatrix}
         \dot{p} \\
         \ddot{p}
-    \end{bmatrix} \\
+    \end{bmatrix} \\ \\ 
     &=
     \begin{bmatrix}
         \dot{x} \\
         \frac{C}{M}\dot{p} - \frac{k}{M}p
-    \end{bmatrix} \\
+    \end{bmatrix} \\ \\ 
     &=
     \begin{bmatrix}
         x_{1} \\
         \frac{C}{M}x_{2} - \frac{k}{M}x_{1} - u
-    \end{bmatrix} \\
+    \end{bmatrix} \\ \\
     &=
     \begin{bmatrix}
         0 & 1\\
@@ -83,29 +121,35 @@ From which we can create the state space,
     \end{bmatrix}
     u
 \end{align*}
-Which implies an overall state space,
-\begin{equation}
+
+Which has the usual state space form,
+
+\begin{equation}\label{eq:sys-ss}
 \mathbf{\dot{x}} = \mathbf{A}\mathbf{x} + \mathbf{B}u
 \end{equation}
 
 where
 
-\begin{math}
+\begin{equation*}
     \mathbf{A} =
     \begin{bmatrix}
         0 & 1\\
         \frac{-k}{M} & \frac{-C}{M} \\
-    \end{bmatrix}\textrm{,}\quad
+    \end{bmatrix}
+    \end{equation*}
+
+    \begin{equation*}
     \mathbf{B} =
     \begin{bmatrix}
         0 \\
         1
     \end{bmatrix}
-\end{math}
+\end{equation*}
 
 We model the sensors similarly. The values of the matrices depend on which modes
-we are able to observe. In this example we have said that we can observe position,
-but not velocity. Our sensor vector is therefore simply a scalar value equal to
+we are able to observe. In this example we have said that we are able to observe
+position, but not velocity. Our sensor vector is therefore simply a scalar
+value equal to
 the first mode (position) of the system:
 
 \begin{equation}
@@ -116,7 +160,7 @@ the first mode (position) of the system:
     = x_{1}
 \end{equation}
 
-and the state space equations are therefore:
+The state space observation equation is therefore:
 
 \begin{equation}
     z =
@@ -137,14 +181,22 @@ and the state space equations are therefore:
 
 which we write using the usual state space notation.
 
-\begin{equation}
+\begin{equation}\label{eq:obs-ss}
 z = \mathbf{C}\mathbf{x} + \mathbf{D}u
 \end{equation}
 
+These are the key equations used in both the particle and Kalman filtering
+algorithms.
+
+Although the derivations of these state space forms are long-winded, the
+formation of the state space is an important step for a Bayes filter.
+
+\subsubsection{Discrete System Issues}\label{sec:discrete}
 Even though we have the system in state space form, it is not quite ready for
 use as a model for a Bayes filter. There is a subtle change in the form of equations
-\ref{eq:TODO} and \ref{eq:TODO} when used with a discrete system. The changes are shown here
-without justification.\footnote{TODO}
+\ref{eq:sys-ss} and \ref{eq:obs-ss} when used to model a discrete system,
+such as when modelling using Matlab. The
+changes are shown here without justification.\footnote{TODO}
 
 \begin{equation}
 \mathbf{x_{t+1}} = \mathbf{F}\mathbf{x_{t}} + \mathbf{G}u_{t}
@@ -155,107 +207,117 @@ z_{t} = \mathbf{H}\mathbf{x_{t}} + \mathbf{J}u_{t}
 \end{equation}
 
 where
-
-\begin{math}
+%TODO align these
+\begin{equation*}
     \mathbf{F} = \mathrm{\Delta t}\mathbf{A} + \mathbf{I_{4}}
-    \textrm{,}\quad\\
-    \mathbf{G} = \mathrm{\Delta t}\mathbf{B}
-    \textrm{,}\quad\\
-    \mathbf{H} = \mathbf{C}
-    \textrm{,}\quad\\
-    \mathbf{J} = \mathbf{D}
-\end{math}
+    \quad\quad\mathbf{H} = \mathbf{C}
+\end{equation*}
+\begin{equation*}
+\mathbf{G} = \mathrm{\Delta t}\mathbf{B}
+\quad\quad\quad\mathbf{J} = \mathbf{D}
+\end{equation*}
 
-These are the key equations used in both the particle and Kalman filtering
-algorithms.
+The reason for these changes is beyond the scope of this discussion and does
+not affect any results.
 
-Although the derivations of these state space forms are long-winded, the
-formation of the state space is an important step for a Bayes filter.
+\subsection{Estimation Process}
+The aim of the Bayes filter is to find the belief about the current state,
 
-\subsubsection{Estimation Process}
-The aim of the Bayes filter is to find the belief about the current state.
-
-\begin{math}
+\begin{equation}
 Bel(\mathbf{x}_{t}) = p(\mathbf{x}_{t} | \mathbf{z}_{1}, \mathbf{z}_{2}, \dots
 , \mathbf{z}_{t})
-\end{math}
+\end{equation}
 
 that is, the probability of $\mathbf{x}_{t}$ given all the data we've seen so far.
-Roughly speaking, the belief answers the question \emph{What is the probability
-that the cart is at location x if the history of sensor measurements is
-$\mathbf{z}_{1}, \mathbf{z}_{2}, \dots, \mathbf{z}_{t}$?} for all possible
-locations.
+Roughly speaking, the belief answers the question: \emph{What is the probability
+that the system's state is $\mathbf{x}$ if the history of sensor measurements is
+$\mathbf{z}_{1}, \mathbf{z}_{2}, \dots, \mathbf{z}_{t}$}?
 
-The number of observations grows with time. To make the computation tractable,
-Bayes filters assumet the dynamic system is \emph{Markov}\footnote{TODO:
-explanation of a Markov process}, the result of this is that we assume that the
-current state $\mathbf{x}_{t}$ contains all relevent information. Returning to
-the example given previously, the Markov assumption implies that sensor measurements
-depend only on an objects current physical location and that an object's location at
+The number of observations grows with time, and will get large very quickly
+(withing a few seconds) in any system where measurements are taken at a high rate.
+To make the computation tractable,
+Bayes filters assume that the dynamic system is a \emph{Markov} process\footnote{TODO:
+explanation of a Markov process}. The result of this assumption is that we can
+assume that the
+current state $\mathbf{x}_{t}$ contains all the information we need. Using
+the cart example given previously, the Markov assumption implies that sensor measurements
+depend only on the carts current position and velocity, and that its position
+and velocity (stat) at
 time $t$ depends only on the previous state $\mathbf{x}_{t-1}$. That is, states
-before $\mathbf{x}_{t-1}$ provide no additional information under this assumption.
+before $\mathbf{x}_{t-1}$ provide no additional information under this Markov
+assumption.
 
-With this assumption, the belief function simplifies to that shown in
-Equation \ref{eq:markov-belief}.
+With this assumption made, the belief function simplifies to:
 
 \begin{equation}\label{eq:markov-belief}
 Bel(\mathbf{x}_{t}) = p(\mathbf{x}_{t} | \mathbf{z}_{t})
 \end{equation}
 
-\subsubsection{Updating the Bayes Filter}
-Whenever a sensor provides a new observation $\mathbf{z}_{t}$\footnote{TODO:
-remember that often z\_t is simpy a scalar}, the filter predicts state according
-to \ref{eq:predict}. Note that the new sensor observation is not used in this step.
+\subsubsection{Updating the Bayes Filter}\label{sec:updating-bayes}
+Whenever a sensor provides a new observation\footnote{
+    Although written as a vector generally it is worth noting that in many systems,
+    including the cart system above, there is only a single observation and the
+    observation vector has only one element, i.e., it is a scalar}
+$\mathbf{z}_{t}$, the filter predicts state according
+to (\ref{eq:bayes-predict}). Note that the new sensor observation is not used in this step.
 
-\begin{equation}\label{bayes-predict}
+\begin{equation}\label{eq:bayes-predict}
 p(\mathbf{x}_{t} | \mathbf{z}_{t-1}) = \int{p(\mathbf{x}_{t} | \mathbf{x}_{t-1})
 p(\mathbf{x}_{t} | \mathbf{z}_{t-1})\mathrm{d}\mathbf{x}_{t-1}}
 \end{equation}
 
 The filter then corrects the predicted estimate using the new sensor observation
-according to \ref{eq:update}
+according to\footnote{
+We can write (\ref{eq:bayes-update}) as
+$\alpha p(\mathbf{z}_{t} | \mathbf{x}_{t})p(\mathbf{x}_{t} | \mathbf{z}_{t-1})$
+if we know that the sensor variance does not change with time.
+}
+    (\ref{eq:bayes-update}).
 
-\begin{align}\label{bayes-update}
-    p(\mathbf{x}_{t} | \mathbf{z}_{t}) &=
+\begin{equation}\label{eq:bayes-update}
+    p(\mathbf{x}_{t} | \mathbf{z}_{t}) =
     \frac
     {p(\mathbf{z}_{t} | \mathbf{x}_{t})p(\mathbf{x}_{t} | \mathbf{z}_{t-1})}
-    {p(\mathbf{z}_{t} | \mathbf{z}_{t-1}}\\\\
-    &=
-    \alpha p(\mathbf{z}_{t} | \mathbf{x}_{t})p(\mathbf{x}_{t} | \mathbf{z}_{t-1})
-\end{align}
+    {p(\mathbf{z}_{t} | \mathbf{z}_{t-1})}\\
+\end{equation}
 
 %TODO make a comparison to Bayes Rule
 
 It is often difficult to understand exactly what this all means just by looking at
-Equations TODO through TODO, and a more qualitative description can clarify things.
+Equations (\ref{eq:bayes-predict}) and (\ref{eq:bayes-update}).
+A more qualitative description is often more helpful for understanding what is
+happening.
 
+\begin{compactitem}
+\item
 $p(\mathbf{z}_{t} | \mathbf{x}_{t})$ is the perceptual model. It is the probability
 of seeing a particular observation given that the system is in some state
 $\mathbf{x}_{t}$ at time $t$. Using the previous example, it describes the
 likelihood of making observation $z$ given that the cart is at location $x$.
-The distribution is a property of a given sensor.
-
+The distribution is a property of a given sensor. \\
 % TODO if filling required: to plots of good vs bad sensors.
-
+\item
 $p(\mathbf{x}_{t} | \mathbf{x}_{t-1})$ is sometimes referred to as the action
 model and describes the system dynamics. This is why it is essential to formulate
 a state space model of the system under examination, as this is what is used to
 formulate the distribution.
+\end{compactitem}
 
-At this point it is worth iterating that Bayes filters only provide a
+At this point it is worth iterating that Bayes filters only provides a
 probabilistic framework for recursive state estimation and that implementing
-a Bayes filter required specifying both perceptual model
+a Bayes filter required specifying the perceptual model
 $p(\mathbf{z}_{t} | \mathbf{x}_{t})$, the system dynamics
 $p(\mathbf{x}_{t} | \mathbf{x}_{t+1})$ and the representation of the Belief
 $p(\mathbf{x}_{t} | \mathbf{z}_{t})$.
 
 \subsection{The Kalman Implementation}
+%TODO TODO TODO !!!
 The Kalman filter implementation utilises the specified state space system
-model described in Section \ref{sec:TODO}. It is assumed that process noise
+model described in Section \ref{sec:state-space}. It is assumed that process noise
 is added to the state update model thus:
 
 \begin{equation}
-\mathbf{x}_{t+1} = \mathbf{Fx}_{t} \mathbf{Bu}_{t} + \mathbf{w}_t
+\mathbf{x}_{t+1} = \mathbf{Fx}_{t} + \mathbf{Bu}_{t} + \mathbf{w}_t
 \end{equation}
 
 Where $\mathbf{w}_t$ is zero mean, normally-distributed noise with convariance
